@@ -1,0 +1,28 @@
+#include <stdio.h>
+#include <unistd.h>
+#include <stdlib.h>
+#include <fcntl.h> 
+
+int main(void)
+{
+    int fds[2];
+    if(pipe(fds) == -1){
+        perror("pipe error");
+        exit(EXIT_FAILURE);
+    }
+    int ret;
+    int count = 0;
+    int flags = fcntl(fds[1],F_GETFL);
+    fcntl(fds[1],F_SETFL,flags|O_NONBLOCK);
+    while(1){
+        ret = write(fds[1],"A",1);//fds[1]默认是阻塞模式
+        if(ret == -1){
+            perror("write error");
+            break;
+        }
+        count++;
+    }
+    printf("the pipe capcity is = %d\n",count);
+
+    return 0;
+}
